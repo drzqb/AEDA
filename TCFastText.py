@@ -1,7 +1,8 @@
 '''
     基于FASTTEXT的评价二分类
     基于词
-    基于AEDA数据增强的文本分类
+    法一：基于AEDA数据增强的文本分类
+    法二：基于ESimCSE数据增强的文本分类
 '''
 
 import tensorflow as tf
@@ -24,12 +25,12 @@ from utils import load_vocab, single_example_parser_eb, batched_data
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # 使用GPU
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # 屏蔽警告信息
 
-params_check = "modelfiles/tcfasttext_l"
+params_check = "modelfiles/tcfasttext_rs"
 train_file = [
-    'data/TFRecordFile/train_l_word.tfrecord',
+    'data/TFRecordFile/train_rs_word.tfrecord',
 ]
 val_file = [
-    'data/TFRecordFile/val_word.tfrecord',
+    'data/TFRecordFile/val_r_word.tfrecord',
 ]
 
 params_label_size = 2

@@ -2,14 +2,14 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
 
-def compare_fasttext():
+def compare_fasttext(ac="_p"):
     prefix = "modelfiles/tcfasttext"
 
-    with open(prefix + "_s/history.txt", "r", encoding="utf-8") as fr:
+    with open(prefix + ac + "s/history.txt", "r", encoding="utf-8") as fr:
         history_s = fr.read()
         history_s = eval(history_s)
 
-    with open(prefix + "_l/history.txt", "r", encoding="utf-8") as fr:
+    with open(prefix + ac + "l/history.txt", "r", encoding="utf-8") as fr:
         history_l = fr.read()
         history_l = eval(history_l)
 
@@ -58,8 +58,8 @@ def compare_fasttext():
     plt.suptitle("Model Metrics")
 
     plt.tight_layout()
-    plt.savefig("compare.jpg", dpi=500, bbox_inches="tight")
+    plt.savefig("compare" + ac + ".jpg", dpi=500, bbox_inches="tight")
 
 
 if __name__ == "__main__":
-    compare_fasttext()
+    compare_fasttext(ac="_r")

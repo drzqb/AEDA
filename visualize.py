@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
 
-def compare_fasttext(ac="_p"):
-    prefix = "modelfiles/tcfasttext"
+def compare_fasttext(model="tcfasttext", ac="_p"):
+    prefix = "modelfiles/" + model
 
     with open(prefix + ac + "s/history.txt", "r", encoding="utf-8") as fr:
         history_s = fr.read()
@@ -58,8 +58,8 @@ def compare_fasttext(ac="_p"):
     plt.suptitle("Model Metrics")
 
     plt.tight_layout()
-    plt.savefig("compare" + ac + ".jpg", dpi=500, bbox_inches="tight")
+    plt.savefig("compare_" + model + ac + ".jpg", dpi=500, bbox_inches="tight")
 
 
 if __name__ == "__main__":
-    compare_fasttext(ac="_r")
+    compare_fasttext(model="tcfasttext", ac="_p")

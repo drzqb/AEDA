@@ -24,10 +24,10 @@ from utils import load_vocab, single_example_parser_eb, batched_data
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # 使用GPU
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # 屏蔽警告信息
 
-params_check = "modelfiles/tctextcnn_rs"
+params_check = "modelfiles/tctextcnn_rl"
 
 train_file = [
-    'data/TFRecordFile/train_rs_word.tfrecord',
+    'data/TFRecordFile/train_rl_word.tfrecord',
 ]
 val_file = [
     'data/TFRecordFile/val_r_word.tfrecord',

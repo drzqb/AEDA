@@ -268,5 +268,141 @@ def toid_Repeat():
         m_samples_val, m_samples_val_pos, m_samples_val_neg))  # 测试样本总量共：455 ,正样本共：193 ,负样本共：262
 
 
+def toid_Repeat_sort():
+    """
+    在句子中随机重复字词以达到数据增强的目的
+    :return: 按序列长度排序，但对训练的速度的影响暂不明显，可能是数据量小了
+    """
+
+    m_samples_train_s = 0
+    m_samples_train_s_pos = 0
+    m_samples_train_s_neg = 0
+
+    m_samples_train_l = 0
+    m_samples_train_l_pos = 0
+    m_samples_train_l_neg = 0
+
+    m_samples_val = 0
+    m_samples_val_pos = 0
+    m_samples_val_neg = 0
+
+    train_s_writer = tf.io.TFRecordWriter('data/TFRecordFile/train_rs_sort_word.tfrecord')
+    train_l_writer = tf.io.TFRecordWriter('data/TFRecordFile/train_rl_sort_word.tfrecord')
+    val_writer = tf.io.TFRecordWriter('data/TFRecordFile/val_r_sort_word.tfrecord')
+
+    word_dict = load_vocab("data/OriginalFile/word_dict.txt")
+
+    data = pd.read_csv("data/OriginalFile/Ebusiness.csv")
+
+    ngList = []
+
+    for index, row in data.iterrows():
+        ngList.append(len(row["evaluation"]))
+
+    data["length"] = ngList
+
+    data = data.sort_values(by="length", ascending=False)
+
+    k = 1
+
+    for index, row in data.iterrows():
+        sen = row["evaluation"].lower().strip()
+        label = row["label"].strip()
+
+        if label == "正面":
+            label = 1
+        else:
+            label = 0
+
+        print(k)
+        print("sen: ", sen)
+        print("lab: ", label)
+        print()
+
+        senw = jieba.lcut(sen)
+
+        sen2id = [word_dict[word] if word in word_dict.keys() else word_dict["[UNK]"] for word in senw]
+        sen_feature = [tf.train.Feature(int64_list=tf.train.Int64List(value=[sen_])) for sen_ in sen2id]
+
+        label_feature = tf.train.Feature(int64_list=tf.train.Int64List(value=[label]))
+
+        seq_example = tf.train.SequenceExample(
+            feature_lists=tf.train.FeatureLists(feature_list={
+                'sen': tf.train.FeatureList(feature=sen_feature),
+            }),
+            context=tf.train.Features(feature={
+                'label': label_feature
+            }),
+
+        )
+
+        serialized = seq_example.SerializeToString()
+
+        if np.random.rand() < 0.1:
+            val_writer.write(serialized)
+            m_samples_val += 1
+            if label == 1:
+                m_samples_val_pos += 1
+            else:
+                m_samples_val_neg += 1
+        else:
+            train_s_writer.write(serialized)
+            train_l_writer.write(serialized)
+            m_samples_train_s += 1
+            m_samples_train_l += 1
+            if label == 1:
+                m_samples_train_s_pos += 1
+                m_samples_train_l_pos += 1
+            else:
+                m_samples_train_s_neg += 1
+                m_samples_train_l_neg += 1
+
+            if np.random.rand() < 0.3:
+                sennew = [s for s in sen]
+
+                for idx in reversed(range(len(sen))):
+                    if np.random.rand() < 0.15:
+                        sennew.insert(idx, sen[idx])
+
+                if len(sennew) != len(sen):
+                    print(sen)
+                    print("".join(sennew))
+
+                    senw = jieba.lcut("".join(sennew))
+
+                    sen2id = [word_dict[word] if word in word_dict.keys() else word_dict["[UNK]"] for word in senw]
+                    sen_feature = [tf.train.Feature(int64_list=tf.train.Int64List(value=[sen_])) for sen_ in sen2id]
+
+                    seq_example = tf.train.SequenceExample(
+                        feature_lists=tf.train.FeatureLists(feature_list={
+                            'sen': tf.train.FeatureList(feature=sen_feature),
+                        }),
+                        context=tf.train.Features(feature={
+                            'label': label_feature
+                        }),
+
+                    )
+
+                    serialized = seq_example.SerializeToString()
+                    train_l_writer.write(serialized)
+
+                    m_samples_train_l += 1
+                    if label == 1:
+                        m_samples_train_l_pos += 1
+                    else:
+                        m_samples_train_l_neg += 1
+
+        k += 1
+
+    print('\n')
+
+    print("训练集small样本总量共：%d ,正样本共：%d ,负样本共：%d" % (
+        m_samples_train_s, m_samples_train_s_pos, m_samples_train_s_neg))  # 训练集small样本总量共：3840 ,正样本共：1698 ,负样本共：2142
+    print("训练集large样本总量共：%d ,正样本共：%d ,负样本共：%d" % (
+        m_samples_train_l, m_samples_train_l_pos, m_samples_train_l_neg))  # 训练集large样本总量共：4920 ,正样本共：2142 ,负样本共：2778
+    print('测试样本总量共：%d ,正样本共：%d ,负样本共：%d ' % (
+        m_samples_val, m_samples_val_pos, m_samples_val_neg))  # 测试样本总量共：443 ,正样本共：210 ,负样本共：233
+
+
 if __name__ == '__main__':
-    toid_Repeat()
+    toid_Repeat_sort()
